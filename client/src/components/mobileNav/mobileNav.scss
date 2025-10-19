@@ -1,0 +1,41 @@
+@import "../../style.scss";
+
+.mobile-nav {
+  @include themify($themes) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+    background-color: themed("bg");
+    border-top: 1px solid themed("border");
+    display: none;
+    z-index: 1000;
+
+    @include mobile {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      align-items: center;
+    }
+
+    .tab {
+      color: themed("textColorSoft");
+      text-decoration: none;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 11px;
+
+      &.active {
+        color: themed("textColor");
+      }
+
+      svg {
+        font-size: 22px;
+      }
+    }
+  }
+}
