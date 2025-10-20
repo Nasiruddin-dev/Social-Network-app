@@ -16,7 +16,7 @@ export const getStories = (req, res) => {
   LEFT JOIN relationships AS r ON (s.userid = r.followedUserid AND r.followerUserid = ?) LIMIT 4`;
 
     db.query(q, [userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -46,7 +46,7 @@ export const addStory = async (req, res) => {
       db.query(q, values, (err, data) => {
         if (err) {
           console.log("Story creation error:", err);
-          return res.status(500).json(err);
+          return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
         }
         return res.status(200).json("Story has been created.");
       });
@@ -67,7 +67,7 @@ export const deleteStory = (req, res) => {
   const q = "DELETE FROM stories WHERE `id`=? AND `userid` = ?";
 
     db.query(q, [req.params.id, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       if (data.affectedRows > 0)
         return res.status(200).json("Story has been deleted.");
       return res.status(403).json("You can delete only your story!");

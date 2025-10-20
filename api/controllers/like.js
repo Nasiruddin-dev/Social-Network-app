@@ -6,7 +6,7 @@ export const getLikes = (req,res)=>{
     const q = "SELECT userid FROM likes WHERE postid = ?";
 
     db.query(q, [req.query.postid], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data.map(like=>like.userid));
     });
 }
@@ -26,7 +26,7 @@ export const addLike = (req, res) => {
     ];
 
     db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Post has been liked.");
     });
   });
@@ -43,7 +43,7 @@ export const deleteLike = (req, res) => {
     const q = "DELETE FROM likes WHERE `userid` = ? AND `postid` = ?";
 
     db.query(q, [userInfo.id, req.query.postid], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Post has been disliked.");
     });
   });

@@ -7,7 +7,7 @@ export const getUser = (req, res) => {
   const q = "SELECT * FROM users WHERE id=?";
 
   db.query(q, [userid], (err, data) => {
-    if (err) return res.status(500).json(err);
+    if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
     const { password, ...info } = data[0];
     return res.json(info);
   });
@@ -59,8 +59,8 @@ export const updateUser = async (req, res) => {
         ],
         (err, data) => {
           if (err) {
-            console.log('SQL error:', err);
-            return res.status(500).json(err);
+          console.log('SQL error:', err);
+          return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
           }
           if (data && data.affectedRows > 0) return res.json("Updated!");
           return res.status(403).json("You can update only your post!");
@@ -98,9 +98,9 @@ export const searchUsers = (req, res) => {
   console.log("Executing query with term:", searchTerm);
 
   db.query(q, [searchTerm, searchTerm], (err, data) => {
-    if (err) {
-      console.error("Search query error:", err);
-      return res.status(500).json(err);
+      if (err) {
+        console.error("Search query error:", err);
+        return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
     }
     console.log("Search results count:", data.length);
     return res.json(data);

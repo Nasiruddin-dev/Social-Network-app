@@ -16,7 +16,7 @@ export const getNotifications = (req, res) => {
                LIMIT 50`;
 
     db.query(q, [userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -32,7 +32,7 @@ export const markAsRead = (req, res) => {
     const q = "UPDATE notifications SET isRead = 1 WHERE id = ? AND receiverid = ?";
 
     db.query(q, [req.params.id, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Notification marked as read");
     });
   });

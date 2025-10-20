@@ -34,7 +34,7 @@ export const getConversations = (req, res) => {
     `;
 
     db.query(q, [userInfo.id, userInfo.id, userInfo.id, userInfo.id, userInfo.id, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -63,7 +63,7 @@ export const getMessages = (req, res) => {
     `;
 
     db.query(q, [userInfo.id, otherUserId, otherUserId, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
 
       // Mark messages as read
         const updateQ = "UPDATE `messages` SET isRead = 1 WHERE senderid = ? AND receiverid = ? AND isRead = 0";
@@ -94,7 +94,7 @@ export const sendMessage = (req, res) => {
     ];
 
     db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Message sent.");
     });
   });

@@ -22,7 +22,7 @@ export const getGroups = (req, res) => {
     `;
 
     db.query(q, [userInfo.id, userInfo.id, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -56,7 +56,7 @@ export const createGroup = (req, res) => {
     db.query(q, [values], (err, data) => {
       if (err) {
         console.log("Database error:", err);
-        return res.status(500).json(err);
+        return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       }
 
       const groupId = data.insertId;
@@ -67,7 +67,7 @@ export const createGroup = (req, res) => {
       db.query(memberQ, [groupId, userInfo.id, moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")], (err) => {
         if (err) {
           console.log("Error adding creator as member:", err);
-          return res.status(500).json(err);
+          return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
         }
         console.log("Group creation successful");
         return res.status(200).json("Group has been created.");
@@ -93,7 +93,7 @@ export const getGroupMessages = (req, res) => {
     `;
 
     db.query(q, [req.params.groupId], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -126,7 +126,7 @@ export const sendGroupMessage = (req, res) => {
     db.query(q, [values], (err, data) => {
       if (err) {
         console.log("Error inserting group message:", err);
-        return res.status(500).json(err);
+        return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       }
       console.log("Group message sent successfully");
       return res.status(200).json("Message sent.");
@@ -147,14 +147,14 @@ export const getGroupMembers = (req, res) => {
     // Ensure requester is a member or creator
     const authQ = "SELECT creatorid FROM `groups` WHERE id = ?";
     db.query(authQ, [groupId], (err, rows) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       if (rows.length === 0) return res.status(404).json("Group not found");
 
       const isCreator = rows[0].creatorid === userInfo.id;
       if (!isCreator) {
         const memberQ = "SELECT 1 FROM group_members WHERE groupid = ? AND userid = ?";
         db.query(memberQ, [groupId, userInfo.id], (err, memRows) => {
-          if (err) return res.status(500).json(err);
+          if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
           if (memRows.length === 0) return res.status(403).json("Not authorized");
           // proceed to fetch members
           const q = `
@@ -165,7 +165,7 @@ export const getGroupMembers = (req, res) => {
             ORDER BY gm.joinedAt ASC
           `;
           db.query(q, [groupId], (err, data) => {
-            if (err) return res.status(500).json(err);
+            if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
             return res.status(200).json(data);
           });
         });
@@ -179,7 +179,7 @@ export const getGroupMembers = (req, res) => {
           ORDER BY gm.joinedAt ASC
         `;
         db.query(q, [groupId], (err, data) => {
-          if (err) return res.status(500).json(err);
+          if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
           return res.status(200).json(data);
         });
       }
@@ -202,7 +202,7 @@ export const addGroupMember = (req, res) => {
 
     const authQ = "SELECT creatorid FROM `groups` WHERE id = ?";
     db.query(authQ, [groupId], (err, rows) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       if (rows.length === 0) return res.status(404).json("Group not found");
       if (rows[0].creatorid !== userInfo.id)
         return res.status(403).json("Only the group creator can add members");
@@ -217,7 +217,7 @@ export const addGroupMember = (req, res) => {
             if (err.code === "ER_DUP_ENTRY" || err.code === "ER_DUP_KEY") {
               return res.status(200).json("User is already a member.");
             }
-            return res.status(500).json(err);
+            return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
           }
           return res.status(201).json("Member added");
         }

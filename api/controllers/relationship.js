@@ -6,7 +6,7 @@ export const getRelationships = (req,res)=>{
     const q = "SELECT followerUserid FROM relationships WHERE followedUserid = ?";
 
     db.query(q, [req.query.followedUserid], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data.map(relationship=>relationship.followerUserid));
     });
 }
@@ -18,7 +18,7 @@ export const getFollowers = (req, res) => {
              JOIN users u ON u.id = r.followerUserid
              WHERE r.followedUserid = ?`;
   db.query(q, [userid], (err, data) => {
-    if (err) return res.status(500).json(err);
+    if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
     return res.status(200).json(data);
   });
 };
@@ -30,7 +30,7 @@ export const getFollowing = (req, res) => {
              JOIN users u ON u.id = r.followedUserid
              WHERE r.followerUserid = ?`;
   db.query(q, [userid], (err, data) => {
-    if (err) return res.status(500).json(err);
+    if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
     return res.status(200).json(data);
   });
 };
@@ -50,7 +50,7 @@ export const addRelationship = (req, res) => {
     ];
 
     db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       
       // Create notification for the followed user
       createNotification(userInfo.id, req.body.userid, 'follow', 'started following you');
@@ -71,7 +71,7 @@ export const deleteRelationship = (req, res) => {
     const q = "DELETE FROM relationships WHERE `followerUserid` = ? AND `followedUserid` = ?";
 
     db.query(q, [userInfo.id, req.query.userid], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Unfollow");
     });
   });

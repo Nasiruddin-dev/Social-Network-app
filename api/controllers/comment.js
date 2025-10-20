@@ -8,7 +8,7 @@ export const getComments = (req, res) => {
     `;
 
   db.query(q, [req.query.postid], (err, data) => {
-    if (err) return res.status(500).json(err);
+    if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
     return res.status(200).json(data);
   });
 };
@@ -29,7 +29,7 @@ export const addComment = (req, res) => {
     ];
 
     db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Comment has been created.");
     });
   });
@@ -46,7 +46,7 @@ export const deleteComment = (req, res) => {
   const q = "DELETE FROM comments WHERE `id` = ? AND `userid` = ?";
 
     db.query(q, [commentId, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       if (data.affectedRows > 0) return res.json("Comment has been deleted!");
       return res.status(403).json("You can delete only your comment!");
     });

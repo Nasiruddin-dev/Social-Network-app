@@ -24,7 +24,7 @@ export const getPosts = (req, res) => {
       userid && userid !== "undefined" ? [userid] : [userInfo.id, userInfo.id];
 
     db.query(q, values, (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -62,7 +62,7 @@ export const addPost = async (req, res) => {
       db.query(q, [values], (err, data) => {
         if (err) {
           console.log("Post creation error:", err);
-          return res.status(500).json(err);
+          return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
         }
         return res.status(200).json("Post has been created.");
       });
@@ -83,7 +83,7 @@ export const deletePost = (req, res) => {
       "DELETE FROM posts WHERE `id`=? AND `userid` = ?";
 
     db.query(q, [req.params.id, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       if(data.affectedRows>0) return res.status(200).json("Post has been deleted.");
       return res.status(403).json("You can delete only your post")
     });

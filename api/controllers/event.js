@@ -20,7 +20,7 @@ export const getEvents = (req, res) => {
     `;
 
     db.query(q, [userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json(data);
     });
   });
@@ -45,7 +45,7 @@ export const createEvent = (req, res) => {
     ];
 
     db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
       return res.status(200).json("Event has been created.");
     });
   });
@@ -62,13 +62,13 @@ export const rsvpEvent = (req, res) => {
     // Check if already RSVP'd
     const checkQ = "SELECT * FROM event_rsvp WHERE eventid = ? AND userid = ?";
     db.query(checkQ, [req.params.eventId, userInfo.id], (err, data) => {
-      if (err) return res.status(500).json(err);
+      if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
 
       if (data.length > 0) {
         // Update existing RSVP
         const updateQ = "UPDATE event_rsvp SET status = ? WHERE eventid = ? AND userid = ?";
         db.query(updateQ, [req.body.status, req.params.eventId, userInfo.id], (err) => {
-          if (err) return res.status(500).json(err);
+          if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
           return res.status(200).json("RSVP updated.");
         });
       } else {
@@ -81,7 +81,7 @@ export const rsvpEvent = (req, res) => {
           moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
         ];
         db.query(insertQ, [values], (err) => {
-          if (err) return res.status(500).json(err);
+          if (err) return res.status(500).json(err?.sqlMessage || err?.message || "Server error");
           return res.status(200).json("RSVP created.");
         });
       }
