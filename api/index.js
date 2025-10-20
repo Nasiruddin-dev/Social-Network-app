@@ -16,6 +16,7 @@ import multer from "multer";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import { db } from "./connect.js";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -49,6 +50,16 @@ const upload = multer({ storage: storage });
 app.post("/api/upload", upload.single("file"), (req, res) => {
   const file = req.file;
   res.status(200).json(file.filename);
+});
+
+// Lightweight health check for app and DB connectivity
+app.get("/api/health", (req, res) => {
+  db.query("SELECT 1 AS ok", (err, rows) => {
+    if (err) {
+      return res.status(500).json({ status: "degraded", db: "down", error: String(err.code || err.message) });
+    }
+    res.json({ status: "ok", db: "up", result: rows && rows[0] && rows[0].ok === 1 ? 1 : 0 });
+  });
 });
 
 
