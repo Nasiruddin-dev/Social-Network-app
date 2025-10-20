@@ -5,7 +5,7 @@ import Friend from "../../assets/friend.png";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 
 const Share = () => {
   const [file, setFile] = useState(null);
@@ -22,7 +22,7 @@ const Share = () => {
   // Fetch following list for tagging
   const { data: myFollowing = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
     enabled: showTagModal
   });
 
@@ -37,7 +37,7 @@ const Share = () => {
 
   const mutation = useMutation(
     (newPost) => {
-      return makeRequest.post("/posts", newPost);
+  return axiosInstance.post("/posts", newPost);
     },
     {
       onSuccess: () => {

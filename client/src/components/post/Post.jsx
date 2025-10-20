@@ -9,7 +9,7 @@ import Comments from "../comments/Comments";
 import { useState } from "react";
 import moment from "moment";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 
@@ -24,7 +24,7 @@ const Post = ({ post }) => {
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["likes", post.id],
-    queryFn: () => makeRequest.get("/likes?postid=" + post.id).then((res) => {
+  queryFn: () => axiosInstance.get("/likes?postid=" + post.id).then((res) => {
       return res.data;
     })
   });
@@ -33,8 +33,8 @@ const Post = ({ post }) => {
 
   const mutation = useMutation(
     (liked) => {
-  if (liked) return makeRequest.delete("/likes?postid=" + post.id);
-  return makeRequest.post("/likes", { postid: post.id });
+  if (liked) return axiosInstance.delete("/likes?postid=" + post.id);
+  return axiosInstance.post("/likes", { postid: post.id });
     },
     {
       onSuccess: () => {
@@ -45,7 +45,7 @@ const Post = ({ post }) => {
   );
   const deleteMutation = useMutation(
   (postid) => {
-  return makeRequest.delete("/posts/" + postid);
+  return axiosInstance.delete("/posts/" + postid);
     },
     {
       onSuccess: () => {
@@ -66,14 +66,14 @@ const Post = ({ post }) => {
   // Fetch following list to share with
   const { data: following = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
     enabled: !!currentUser?.id
   });
 
   // Send share as a direct message
   const sendShareMutation = useMutation(
     (receiverId) =>
-      makeRequest.post("/messages", {
+  axiosInstance.post("/messages", {
         receiverId,
         message: `Shared a post by ${post.name}:\n${post.desc || ""}`.slice(0, 500),
       }),

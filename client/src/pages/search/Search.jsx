@@ -1,6 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import "./search.scss";
@@ -17,24 +17,24 @@ const Search = () => {
     queryFn: () => {
       // If no query, show all users (discover mode)
       if (!query) {
-        return makeRequest.get("/users/search?q=").then((res) => res.data);
+  return axiosInstance.get("/users/search?q=").then((res) => res.data);
       }
-      return makeRequest.get(`/users/search?q=${query}`).then((res) => res.data);
+  return axiosInstance.get(`/users/search?q=${query}`).then((res) => res.data);
     }
   });
 
   // Get relationships for each user to show follow status
   const { data: myFollowing = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
   });
 
   const followMutation = useMutation(
     ({ userid, isFollowing }) => {
       if (isFollowing) {
-        return makeRequest.delete(`/relationships?userid=${userid}`);
+  return axiosInstance.delete(`/relationships?userid=${userid}`);
       }
-      return makeRequest.post("/relationships", { userid });
+  return axiosInstance.post("/relationships", { userid });
     },
     {
       onSuccess: () => {

@@ -1,7 +1,7 @@
 import "./groups.scss";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,33 +22,33 @@ const Groups = () => {
   // Fetch groups
   const { data: groups = [], isLoading } = useQuery({
     queryKey: ["groups"],
-    queryFn: () => makeRequest.get("/groups").then((res) => res.data)
+  queryFn: () => axiosInstance.get("/groups").then((res) => res.data)
   });
 
   // Fetch group messages
   const { data: messages = [] } = useQuery({
     queryKey: ["groupMessages", selectedGroup?.id],
-    queryFn: () => makeRequest.get(`/groups/${selectedGroup.id}/messages`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/groups/${selectedGroup.id}/messages`).then((res) => res.data),
     enabled: !!selectedGroup
   });
 
   // Fetch current group members
   const { data: members = [] } = useQuery({
     queryKey: ["groupMembers", selectedGroup?.id],
-    queryFn: () => makeRequest.get(`/groups/${selectedGroup.id}/members`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/groups/${selectedGroup.id}/members`).then((res) => res.data),
     enabled: !!selectedGroup
   });
 
   // Fetch following to suggest adding
   const { data: following = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
     enabled: !!currentUser?.id
   });
 
   // Create group mutation
   const createGroupMutation = useMutation(
-    (newGroup) => makeRequest.post("/groups", newGroup),
+  (newGroup) => axiosInstance.post("/groups", newGroup),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["groups"] });
@@ -61,7 +61,7 @@ const Groups = () => {
 
   // Send message mutation
   const sendMessageMutation = useMutation(
-    (newMessage) => makeRequest.post(`/groups/${selectedGroup.id}/messages`, newMessage),
+  (newMessage) => axiosInstance.post(`/groups/${selectedGroup.id}/messages`, newMessage),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["groupMessages"] });
@@ -72,7 +72,7 @@ const Groups = () => {
 
   // Add member mutation
   const addMemberMutation = useMutation(
-    (userId) => makeRequest.post(`/groups/${selectedGroup.id}/members`, { userId }),
+  (userId) => axiosInstance.post(`/groups/${selectedGroup.id}/members`, { userId }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["groupMembers", selectedGroup?.id] });

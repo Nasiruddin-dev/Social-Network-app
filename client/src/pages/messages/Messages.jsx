@@ -1,7 +1,7 @@
 import "./messages.scss";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useLocation } from "react-router-dom";
@@ -26,7 +26,7 @@ const Messages = () => {
   // Fetch conversations list
   const { data: conversations = [] } = useQuery({
     queryKey: ["conversations"],
-    queryFn: () => makeRequest.get("/messages/conversations").then((res) => res.data),
+  queryFn: () => axiosInstance.get("/messages/conversations").then((res) => res.data),
     refetchInterval: 5000 // Refresh every 5 seconds
   });
 

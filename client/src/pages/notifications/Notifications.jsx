@@ -1,6 +1,6 @@
 import "./notifications.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { Link } from "react-router-dom";
 import moment from "moment";
 
@@ -9,11 +9,11 @@ const Notifications = () => {
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["notifications"],
-    queryFn: () => makeRequest.get("/notifications").then((res) => res.data)
+  queryFn: () => axiosInstance.get("/notifications").then((res) => res.data)
   });
 
   const markAsReadMutation = useMutation(
-    (notificationId) => makeRequest.put(`/notifications/${notificationId}/read`),
+  (notificationId) => axiosInstance.put(`/notifications/${notificationId}/read`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["notifications"] });

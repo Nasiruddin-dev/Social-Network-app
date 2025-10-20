@@ -2,7 +2,7 @@ import "./profile.scss";
 // Removed social/location/message icons per request
 import Posts from "../../components/posts/Posts";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useLocation, Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
@@ -19,29 +19,29 @@ const Profile = () => {
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["user", userid],
-    queryFn: () => makeRequest.get("/users/find/" + userid).then((res) => res.data),
+  queryFn: () => axiosInstance.get("/users/find/" + userid).then((res) => res.data),
     keepPreviousData: false,
   });
 
   const { isLoading: rIsLoading, data: relationshipData } = useQuery({
     queryKey: ["relationship", userid],
-    queryFn: () => makeRequest.get("/relationships?followedUserid=" + userid).then((res) => res.data)
+  queryFn: () => axiosInstance.get("/relationships?followedUserid=" + userid).then((res) => res.data)
   });
 
   const { data: followers = [] } = useQuery({
     queryKey: ["followers", userid],
-    queryFn: () => makeRequest.get("/relationships/followers?userid=" + userid).then((res) => res.data)
+  queryFn: () => axiosInstance.get("/relationships/followers?userid=" + userid).then((res) => res.data)
   });
 
   const { data: following = [] } = useQuery({
     queryKey: ["following", userid],
-    queryFn: () => makeRequest.get("/relationships/following?userid=" + userid).then((res) => res.data)
+  queryFn: () => axiosInstance.get("/relationships/following?userid=" + userid).then((res) => res.data)
   });
 
   // My following (to reflect follow state inside modals for arbitrary users)
   const { data: myFollowing = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data),
     enabled: !!currentUser?.id,
   });
 
@@ -50,9 +50,9 @@ const Profile = () => {
   const mutation = useMutation(
     (following) => {
       if (following) {
-        return makeRequest.delete("/relationships?userid=" + userid);
+  return axiosInstance.delete("/relationships?userid=" + userid);
       }
-      return makeRequest.post("/relationships", { userid });
+  return axiosInstance.post("/relationships", { userid });
     },
     {
       onSuccess: () => {
@@ -73,9 +73,9 @@ const Profile = () => {
   const followUserMutation = useMutation(
     ({ targetUserId, isFollowing }) => {
       if (isFollowing) {
-        return makeRequest.delete(`/relationships?userid=${targetUserId}`);
+  return axiosInstance.delete(`/relationships?userid=${targetUserId}`);
       }
-      return makeRequest.post("/relationships", { userid: targetUserId });
+  return axiosInstance.post("/relationships", { userid: targetUserId });
     },
     {
       onSuccess: () => {
