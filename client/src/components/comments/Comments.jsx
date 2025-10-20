@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import "./comments.scss";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import moment from "moment";
 
 const Comments = ({ postid }) => {
@@ -11,7 +11,7 @@ const Comments = ({ postid }) => {
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["comments"],
-    queryFn: () => makeRequest.get("/comments?postid=" + postid).then((res) => {
+    queryFn: () => axiosInstance.get("/comments?postid=" + postid).then((res) => {
       return res.data;
     })
   });
@@ -20,7 +20,7 @@ const Comments = ({ postid }) => {
 
   const mutation = useMutation(
     (newComment) => {
-      return makeRequest.post("/comments", newComment);
+      return axiosInstance.post("/comments", newComment);
     },
     {
       onSuccess: () => {

@@ -33,7 +33,7 @@ const Messages = () => {
   // Fetch messages for selected chat
   const { data: messages = [] } = useQuery({
     queryKey: ["messages", selectedChat?.id],
-    queryFn: () => makeRequest.get(`/messages/${selectedChat.id}`).then((res) => res.data),
+  queryFn: () => axiosInstance.get(`/messages/${selectedChat.id}`).then((res) => res.data),
     enabled: !!selectedChat,
     refetchInterval: 3000 // Refresh every 3 seconds
   });
@@ -41,12 +41,12 @@ const Messages = () => {
   // Fetch following list for new chat
   const { data: following = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
   });
 
   // Send message mutation
   const sendMessageMutation = useMutation(
-    (newMessage) => makeRequest.post("/messages", newMessage),
+  (newMessage) => axiosInstance.post("/messages", newMessage),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["messages"] });

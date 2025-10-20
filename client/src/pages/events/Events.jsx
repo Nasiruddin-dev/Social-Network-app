@@ -1,7 +1,7 @@
 import "./events.scss";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import AddIcon from "@mui/icons-material/Add";
@@ -26,12 +26,12 @@ const Events = () => {
   // Fetch events
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["events"],
-    queryFn: () => makeRequest.get("/events").then((res) => res.data)
+  queryFn: () => axiosInstance.get("/events").then((res) => res.data)
   });
 
   // Create event mutation
   const createEventMutation = useMutation(
-    (newEvent) => makeRequest.post("/events", newEvent),
+  (newEvent) => axiosInstance.post("/events", newEvent),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -43,7 +43,7 @@ const Events = () => {
 
   // RSVP mutation
   const rsvpMutation = useMutation(
-    ({ eventId, status }) => makeRequest.post(`/events/${eventId}/rsvp`, { status }),
+  ({ eventId, status }) => axiosInstance.post(`/events/${eventId}/rsvp`, { status }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["events"] });

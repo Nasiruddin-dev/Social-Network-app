@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import "./update.scss";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -32,7 +32,7 @@ const Update = ({ setOpenUpdate, user }) => {
 
   const mutation = useMutation(
     (user) => {
-      return makeRequest.put("/users", user);
+  return axiosInstance.put("/users", user);
     },
     {
       onSuccess: () => {

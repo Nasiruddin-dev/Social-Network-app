@@ -1,6 +1,6 @@
 import "./friends.scss";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import { Link } from "react-router-dom";
@@ -12,12 +12,12 @@ const Friends = () => {
   // Fetch following list
   const { data: following = [], isLoading } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
   });
 
   // Unfollow mutation
   const unfollowMutation = useMutation(
-    (userid) => makeRequest.delete(`/relationships?userid=${userid}`),
+  (userid) => axiosInstance.delete(`/relationships?userid=${userid}`),
     {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["myFollowing"] });

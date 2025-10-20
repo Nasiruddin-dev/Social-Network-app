@@ -3,7 +3,7 @@ import { useContext, useRef, useState, useCallback } from "react";
 import "./stories.scss";
 import { AuthContext } from "../../context/authContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import CloseIcon from "@mui/icons-material/Close";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -20,13 +20,13 @@ const Stories = () => {
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["stories"],
-    queryFn: () => makeRequest.get("/stories").then((res) => {
+  queryFn: () => axiosInstance.get("/stories").then((res) => {
       return res.data;
     })
   });
 
   const mutation = useMutation(
-    (img) => makeRequest.post("/stories", { img }),
+  (img) => axiosInstance.post("/stories", { img }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["stories"]);

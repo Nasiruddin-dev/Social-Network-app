@@ -2,7 +2,7 @@
 import "./explore.scss";
 import Posts from "../../components/posts/Posts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { makeRequest } from "../../axios";
+import { axiosInstance } from "../../axios";
 import { useContext } from "react"; // keep
 import { AuthContext } from "../../context/authContext";
 import { Link } from "react-router-dom";
@@ -14,20 +14,20 @@ const Explore = () => {
   // User discovery logic (similar to Search page)
   const { isLoading, error, data: users } = useQuery({
     queryKey: ["exploreUsers"],
-    queryFn: () => makeRequest.get("/users/search?q=").then((res) => res.data)
+  queryFn: () => axiosInstance.get("/users/search?q=").then((res) => res.data)
   });
 
   const { data: myFollowing = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
+  queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
   });
 
   const followMutation = useMutation(
     ({ userid, isFollowing }) => {
       if (isFollowing) {
-        return makeRequest.delete(`/relationships?userid=${userid}`);
+  return axiosInstance.delete(`/relationships?userid=${userid}`);
       }
-      return makeRequest.post("/relationships", { userid });
+  return axiosInstance.post("/relationships", { userid });
     },
     {
       onSuccess: () => {
