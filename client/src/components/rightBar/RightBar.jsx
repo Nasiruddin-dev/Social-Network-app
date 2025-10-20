@@ -13,22 +13,22 @@ const RightBar = () => {
   // Fetch suggested users (users not followed by current user)
   const { data: suggestedUsers = [] } = useQuery({
     queryKey: ["suggestedUsers", currentUser?.id],
-    queryFn: () => makeRequest.get("/users/search?q=").then((res) => res.data)
+    queryFn: () => axiosInstance.get("/users/search?q=").then((res) => res.data)
   });
 
   // Fetch following list
   const { data: myFollowing = [] } = useQuery({
     queryKey: ["myFollowing", currentUser?.id],
-    queryFn: () => makeRequest.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
+    queryFn: () => axiosInstance.get(`/relationships/following?userid=${currentUser.id}`).then((res) => res.data)
   });
 
   // Follow mutation
   const followMutation = useMutation(
     ({ userid, isFollowing }) => {
       if (isFollowing) {
-        return makeRequest.delete(`/relationships?userid=${userid}`);
+        return axiosInstance.delete(`/relationships?userid=${userid}`);
       }
-      return makeRequest.post("/relationships", { userid });
+      return axiosInstance.post("/relationships", { userid });
     },
     {
       onSuccess: () => {
