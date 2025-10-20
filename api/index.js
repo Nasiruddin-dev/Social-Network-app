@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://social-network-app.vercel.app",
   })
 );
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
