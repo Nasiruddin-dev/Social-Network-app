@@ -58,6 +58,8 @@ export const db = mysql.createPool({
   connectionLimit: 10,
   waitForConnections: true,
   queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
   ...connectionConfig,
 });
 
@@ -65,7 +67,7 @@ export const db = mysql.createPool({
 try {
   db.getConnection((err, conn) => {
     if (err) {
-      console.warn(`[db] Initial connection check failed: ${err.code || err.message}`);
+      console.warn(`[db] Initial connection check failed: ${err}`);
     } else {
       conn.release();
     }
@@ -73,3 +75,12 @@ try {
 } catch (_e) {
   // ignore
 }
+
+// Periodic lightweight keep-alive to reduce PROTOCOL_CONNECTION_LOST on idle
+setInterval(() => {
+  db.query('SELECT 1', (err) => {
+    if (err) {
+      console.warn(`[db] Keep-alive failed: ${err}`);
+    }
+  });
+}, 5 * 60 * 1000); // every 5 minutes
