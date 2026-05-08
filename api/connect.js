@@ -23,8 +23,11 @@ function buildConfigFromUrl(urlString) {
       user: decodeURIComponent(u.username),
       password: decodeURIComponent(u.password),
       database: u.pathname.replace(/^\//, ""),
-      ...(sslEnabled ? { ssl: { rejectUnauthorized: false } } : {}),
-    };
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      connectTimeout: 60000,
+  };
   } catch (_e) {
     return null;
   }
