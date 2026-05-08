@@ -17,7 +17,7 @@ const Profile = () => {
 
   const userid = parseInt(useLocation().pathname.split("/")[2]);
 
-  const { isLoading, error, data } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["user", userid],
   queryFn: () => axiosInstance.get("/users/find/" + userid).then((res) => res.data),
     keepPreviousData: false,

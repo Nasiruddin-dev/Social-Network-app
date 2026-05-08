@@ -22,7 +22,7 @@ const Post = ({ post }) => {
 
   const { currentUser } = useContext(AuthContext);
 
-  const { isLoading, error, data } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ["likes", post.id],
   queryFn: () => axiosInstance.get("/likes?postid=" + post.id).then((res) => {
       return res.data;
