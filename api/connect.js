@@ -44,8 +44,11 @@ if (!connectionConfig) {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3306,
-    ...(sslEnabled ? { ssl: { rejectUnauthorized: false } } : {}),
-  };
+   ssl: {
+    rejectUnauthorized: false,
+  },
+  connectTimeout: 60000,
+};
 }
 
 if (process.env.NODE_ENV !== 'test') {
