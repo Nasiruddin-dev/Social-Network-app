@@ -27,13 +27,28 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
-app.use(express.json({ limit: '10mb' }));
+
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.ADDITIONAL_CLIENT_URLS,
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://social-network-app.vercel.app",
+].filter(Boolean).flatMap((origin) => origin.split(",").map((url) => url.trim()).filter(Boolean));
+
+app.use(express.json({ limit: "10mb" }));
 app.use(
   cors({
-    origin: "https://social-network-app.vercel.app",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS origin not allowed"));
+    },
+    credentials: true,
   })
 );
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use("/upload", express.static(path.join(__dirname, "../client/public/upload")));
 const storage = multer.diskStorage({
@@ -75,6 +90,7 @@ app.use("/api/groups", groupRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/messages", messageRoutes);
 
-app.listen(8800, () => {
-  console.log("API working!");
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, () => {
+  console.log(`API working on port ${PORT}!`);
 });
