@@ -40,7 +40,8 @@ app.use(express.json({ limit: "10mb" }));
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) ||
+    origin.includes("vercel.app")) {
         return callback(null, true);
       }
       return callback(new Error("CORS origin not allowed"));
